@@ -304,30 +304,26 @@
     document.getElementById(id).classList.add('active');
   }
 
-  // Function to handle the Batch Control switch
   function toggleBatch() {
-    const status = document.getElementById('batchStatus');
-    const isChecked = document.getElementById('batchSwitch').checked;
-    status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
+  const status = document.getElementById('batchStatus');
+  const isChecked = document.getElementById('batchSwitch').checked;
+  
+  status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
 
-    // Use a multi-location update for batch control
-    // This updates all specified paths at once, which is more efficient
-    // than sending multiple 'set' commands.
-    devicesRef.update({
-      'livingRoom/bulb': isChecked,
-      'bedroom/fan': isChecked,
-      'comfortRoom/light': isChecked // Added Comfort Room light
-    }).catch(error => {
-      console.error("Error updating batch state:", error);
-      // Revert the UI switch state if the update fails
-      document.getElementById('batchSwitch').checked = !isChecked;
-      status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
-    });
+  const updates = {
+    'livingRoom/bulb': isChecked,
+    'bedroom/fan': isChecked,
+    'comfortRoom/light': isChecked,
+    'batchControl': isChecked // save batch state separately
+  };
 
-    // The UI for individual devices will be updated automatically
-    // by the 'on('value', ...)' listeners below when Firebase data changes.
-    // No need to manually toggle individual switches here.
-  }
+  devicesRef.update(updates).catch(error => {
+    console.error("Error updating batch state:", error);
+    document.getElementById('batchSwitch').checked = !isChecked;
+    status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+  });
+}
+
 
   // Function to show/hide device section in Living Room based on select value
   function chooseDevice(device) {
@@ -418,12 +414,13 @@
 
   // 🔁 Sync batch switch if any one of the devices is OFF
   // Optional: You can dynamically determine if all are ON to reflect in batch switch
-  devicesRef.on('value', snapshot => {
-    const data = snapshot.val() || {};
-    const allOn = data.livingRoom?.bulb && data.bedroom?.fan && data.comfortRoom?.light;
-    document.getElementById('batchSwitch').checked = !!allOn;
-    document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${allOn ? 'limegreen' : 'red'};">${allOn ? 'ON' : 'OFF'}</span>`;
-  });
+  // 🔁 Sync batch switch independently
+  devicesRef.child('batchControl').on('value', snapshot => {
+  const isOn = snapshot.val() === true;
+  document.getElementById('batchSwitch').checked = isOn;
+  document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
+});
+
 </script>
 
 </body>
