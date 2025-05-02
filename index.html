@@ -4,23 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login UI</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     body, html {
       height: 100%;
       margin: 0;
       font-family: Arial, sans-serif;
+      /* Using a placeholder image URL here. Replace with your actual background image URL */
       background: url('https://via.placeholder.com/800x600/0c4c4c/ffffff') no-repeat center center;
       background-size: cover;
     }
-
     .login-box {
       width: 100%;
       max-width: 400px;
@@ -29,14 +23,12 @@
       padding: 40px 30px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     }
-
     .login-title {
       text-align: center;
       font-weight: 700;
       font-size: 24px;
       margin-bottom: 30px;
     }
-
     .form-control-custom {
       background-color: #eaeaea;
       border: none;
@@ -46,20 +38,21 @@
       font-weight: 600;
       color: #aaa;
     }
-
     .input-icon {
       position: absolute;
       top: 50%;
       left: 15px;
       transform: translateY(-50%);
       color: #888;
+      z-index: 2; /* Ensure icon is above input */
     }
-
-    .form-group {
+     .form-group {
       position: relative;
       margin-bottom: 20px;
     }
-
+     .form-control-custom::placeholder {
+        color: #bbb; /* Lighter color for placeholder */
+     }
     .login-arrow {
       width: 80px;
       height: 80px;
@@ -73,27 +66,22 @@
       transition: background 0.3s;
       position: relative;
     }
-
     .login-arrow:hover {
       background: #ddd;
     }
-
     .login-arrow i {
       font-size: 28px;
       color: #666;
     }
-
-    .spinner-border {
+     .spinner-border {
       width: 28px;
       height: 28px;
     }
-
     .alert-box {
       display: none;
       margin-top: 20px;
       text-align: center;
     }
-
     @media (max-width: 576px) {
       .login-box {
         padding: 30px 20px;
@@ -106,22 +94,13 @@
     <div class="login-box">
       <div class="login-title">LOGIN</div>
       <div class="form-group">
-        <i class="fa fa-user input-icon"></i>
-        <input
-          type="text"
-          id="username"
-          class="form-control form-control-custom"
-          placeholder="USERNAME"
-        />
+        <!-- Changed to email input and envelope icon -->
+        <i class="fa fa-envelope input-icon"></i>
+        <input type="email" id="email" class="form-control form-control-custom" placeholder="EMAIL" required />
       </div>
       <div class="form-group">
         <i class="fa fa-lock input-icon"></i>
-        <input
-          type="password"
-          id="password"
-          class="form-control form-control-custom"
-          placeholder="PASSWORD"
-        />
+        <input type="password" id="password" class="form-control form-control-custom" placeholder="PASSWORD" required />
       </div>
       <div class="login-arrow" onclick="login()">
         <i id="arrow-icon" class="fas fa-arrow-right"></i>
@@ -129,34 +108,106 @@
           <span class="visually-hidden">Loading...</span>
         </div>
       </div>
+      <!-- Alert box for error messages -->
       <div id="alert" class="alert alert-danger alert-box" role="alert">
-        Incorrect username or password.
+        <!-- Error message will be inserted here by the script -->
       </div>
     </div>
   </div>
 
-  <script>
-    function login() {
-      const username = document.getElementById("username").value.trim();
+  <!-- Firebase Auth Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    // Import the necessary Authentication modules
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+    // Removed Realtime Database imports as they are not needed for just signing in
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk", // <-- Make sure this is your actual API Key from project settings!
+      authDomain: "ilaw-piensi.firebaseapp.com",
+      databaseURL: "https://ilaw-piensi-default-rtdb.asia-southeast1.firebasedatabase.app/", // Keep if you plan to use RTDB for other data
+      projectId: "ilaw-piensi",
+      // Add other config properties if you need them for other Firebase services later
+    };
+
+    // Initialize Firebase app
+    const app = initializeApp(firebaseConfig);
+
+    // Initialize Firebase Authentication
+    const auth = getAuth(app);
+
+    window.login = async function () {
+      // Get email and password from the input fields (using the updated ID 'email')
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
+
       const arrowIcon = document.getElementById("arrow-icon");
       const spinner = document.getElementById("loading-spinner");
       const alertBox = document.getElementById("alert");
 
-      alertBox.style.display = "none";
-      arrowIcon.classList.add("d-none");
-      spinner.classList.remove("d-none");
+      alertBox.style.display = "none"; // Hide previous alerts
+      arrowIcon.classList.add("d-none"); // Hide arrow icon
+      spinner.classList.remove("d-none"); // Show loading spinner
 
-      setTimeout(() => {
+      // Basic validation: Check if fields are not empty
+      if (!email || !password) {
+          spinner.classList.add("d-none");
+          arrowIcon.classList.remove("d-none");
+          alertBox.innerText = "Please enter email and password."; // Update alert message
+          alertBox.style.display = "block"; // Show alert
+          return; // Stop the login process
+      }
+
+
+      try {
+        // Use Firebase Authentication's signInWithEmailAndPassword
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // Sign-in successful!
+        const user = userCredential.user;
+        console.log("User signed in successfully:", user.email, user.uid);
+
+        // Hide spinner and show arrow before redirecting
         spinner.classList.add("d-none");
         arrowIcon.classList.remove("d-none");
 
-        if (username === "Admin" && password === "Secret123") {
-          window.location.href = "dashboard.html";
-        } else {
-          alertBox.style.display = "block";
-        }
-      }, 1500);
+        // Redirect to dashboard or success page
+        // IMPORTANT: Make sure you have a 'dashboard.html' file or change the URL
+        window.location.href = "dashboard.html";
+
+      } catch (error) {
+        // Handle errors from Firebase Authentication
+        console.error("Firebase Auth Error:", error.code, error.message);
+
+        // Hide spinner and show arrow
+        spinner.classList.add("d-none");
+        arrowIcon.classList.remove("d-none");
+
+        // Display a generic error message for security (avoid revealing if email exists)
+        alertBox.innerText = "Incorrect email or password."; // Use a generic message
+        alertBox.style.display = "block"; // Show alert
+
+        // Optional: More specific error messages for debugging if needed
+        // console.log("Error Code:", error.code);
+        // console.log("Error Message:", error.message);
+
+        // Example of more specific error handling (optional):
+        // switch (error.code) {
+        //   case 'auth/user-not-found':
+        //   case 'auth/wrong-password':
+        //     alertBox.innerText = "Incorrect email or password."; // Still generic for user
+        //     break;
+        //   case 'auth/invalid-email':
+        //     alertBox.innerText = "Invalid email address format.";
+        //     break;
+        //   case 'auth/too-many-requests':
+        //     alertBox.innerText = "Too many login attempts. Please try again later.";
+        //     break;
+        //   default:
+        //     alertBox.innerText = "An unexpected error occurred. Please try again.";
+        // }
+        // alertBox.style.display = "block";
+      }
     }
   </script>
 
