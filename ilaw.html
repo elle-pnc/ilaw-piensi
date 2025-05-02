@@ -126,7 +126,7 @@
     }
 
     input:checked + .slider {
-      background-color: green;
+      background-color: limegreen; /* Changed to limegreen for consistency */
     }
 
     input:checked + .slider:before {
@@ -164,6 +164,11 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+    }
+
+    /* Added style for status text color */
+    .status span {
+        font-weight: bold; /* Make ON/OFF text bold */
     }
   </style>
 </head>
@@ -271,70 +276,155 @@
     </div>
   </div>
 
-  <script>
-    function showPage(id) {
-      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-    function toggleBatch() {
-      const status = document.getElementById('batchStatus');
-      const isChecked = document.getElementById('batchSwitch').checked;
-      status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
+<script>
+  // Your Firebase config here
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk",
+    authDomain: "ilaw-piensi.firebaseapp.com",
+    databaseURL: "https://ilaw-piensi-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "ilaw-piensi",
+  };
 
-      // Apply batch state to each device
-      const bulbSwitch = document.getElementById('bulbSwitch');
-      const fanSwitch = document.getElementById('fanSwitch');
-      const comfortLightSwitch = document.getElementById('comfortLightSwitch');
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-      bulbSwitch.checked = isChecked;
-      toggleBulb();
+  // Reference to the root of the 'devices' node
+  const devicesRef = db.ref('devices');
+</script>
 
-      fanSwitch.checked = isChecked;
-      toggleFan();
+<script>
+  // Function to show a specific page
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
-      comfortLightSwitch.checked = isChecked;
-      toggleComfortLight();
-    }
+  // Function to handle the Batch Control switch
+  function toggleBatch() {
+    const status = document.getElementById('batchStatus');
+    const isChecked = document.getElementById('batchSwitch').checked;
+    status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
 
-    function chooseDevice(device) {
-      document.getElementById('light-bulb-section').style.display = device === 'light-bulb' ? 'block' : 'none';
-    }
+    // Use a multi-location update for batch control
+    // This updates all specified paths at once, which is more efficient
+    // than sending multiple 'set' commands.
+    devicesRef.update({
+      'livingRoom/bulb': isChecked,
+      'bedroom/fan': isChecked,
+      'comfortRoom/light': isChecked // Added Comfort Room light
+    }).catch(error => {
+      console.error("Error updating batch state:", error);
+      // Revert the UI switch state if the update fails
+      document.getElementById('batchSwitch').checked = !isChecked;
+      status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    });
 
-    function toggleBulb() {
-      const bulbImage = document.getElementById('bulbImage');
-      const status = document.getElementById('bulbStatus');
-      const isChecked = document.getElementById('bulbSwitch').checked;
+    // The UI for individual devices will be updated automatically
+    // by the 'on('value', ...)' listeners below when Firebase data changes.
+    // No need to manually toggle individual switches here.
+  }
 
-      bulbImage.src = isChecked ? 'Light_ON.png' : 'Light_OFF.png';
-      status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
-    }
+  // Function to show/hide device section in Living Room based on select value
+  function chooseDevice(device) {
+    document.getElementById('light-bulb-section').style.display = device === 'light-bulb' ? 'block' : 'none';
+  }
 
-    function chooseBedroomDevice(device) {
-      document.getElementById('fan-section').style.display = device === 'fan' ? 'block' : 'none';
-    }
+  // Function to toggle Living Room Bulb state
+  function toggleBulb() {
+    const isChecked = document.getElementById('bulbSwitch').checked;
+    // 🔥 Update Firebase
+    devicesRef.child('livingRoom/bulb').set(isChecked).catch(error => {
+      console.error("Error updating bulb state:", error);
+      // Revert the UI switch state if the update fails
+      document.getElementById('bulbSwitch').checked = !isChecked;
+      document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    });
+    // UI update handled by the 'on('value', ...)' listener below
+  }
 
-    function toggleFan() {
-      const fanImage = document.getElementById('fanImage');
-      const status = document.getElementById('fanStatus');
-      const isChecked = document.getElementById('fanSwitch').checked;
+  // Function to show/hide device section in Bedroom based on select value
+  function chooseBedroomDevice(device) {
+    document.getElementById('fan-section').style.display = device === 'fan' ? 'block' : 'none';
+  }
 
-      fanImage.src = isChecked ? 'Fan_ON.gif' : 'Fan_OFF.png';
-      status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
-    }
+  // Function to toggle Bedroom Fan state
+  function toggleFan() {
+    const isChecked = document.getElementById('fanSwitch').checked;
+    // 🔥 Update Firebase
+    devicesRef.child('bedroom/fan').set(isChecked).catch(error => {
+       console.error("Error updating fan state:", error);
+      // Revert the UI switch state if the update fails
+      document.getElementById('fanSwitch').checked = !isChecked;
+       document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    });
+     // UI update handled by the 'on('value', ...)' listener below
+  }
 
-    function chooseComfortDevice(device) {
-      document.getElementById('comfort-light-section').style.display = device === 'light' ? 'block' : 'none';
-    }
+  // Function to show/hide device section in Comfort Room based on select value
+  function chooseComfortDevice(device) {
+    document.getElementById('comfort-light-section').style.display = device === 'light' ? 'block' : 'none';
+  }
 
-    function toggleComfortLight() {
-      const lightImage = document.getElementById('comfortLightImage');
-      const status = document.getElementById('comfortLightStatus');
-      const isChecked = document.getElementById('comfortLightSwitch').checked;
+  // Function to toggle Comfort Room Light state
+  function toggleComfortLight() {
+    const isChecked = document.getElementById('comfortLightSwitch').checked;
+    // 🔥 Update Firebase - Now includes writing to the database!
+    devicesRef.child('comfortRoom/light').set(isChecked).catch(error => {
+       console.error("Error updating comfort light state:", error);
+      // Revert the UI switch state if the update fails
+      document.getElementById('comfortLightSwitch').checked = !isChecked;
+       document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    });
+     // UI update handled by the 'on('value', ...)' listener below
+  }
 
-      lightImage.src = isChecked ? 'Light_ON.png' : 'Light_OFF.png';
-      status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
-    }
-  </script>
+  // --- Firebase Listeners for Real-time Sync ---
+  // These listeners ensure the UI reflects the state in the database
+  // even if another client changes the data. They also handle
+  // the initial state when the page loads.
+
+  // 🔁 Sync light bulb state
+  devicesRef.child('livingRoom/bulb').on('value', snapshot => {
+    const isOn = snapshot.val();
+    // Ensure snapshot is not null if data doesn't exist yet, default to false (OFF)
+    const currentState = isOn !== null ? isOn : false;
+    document.getElementById('bulbSwitch').checked = currentState;
+    document.getElementById('bulbImage').src = currentState ? 'Light_ON.png' : 'Light_OFF.png';
+    document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+  });
+
+  // 🔁 Sync fan state
+  devicesRef.child('bedroom/fan').on('value', snapshot => {
+    const isOn = snapshot.val();
+    const currentState = isOn !== null ? isOn : false;
+    document.getElementById('fanSwitch').checked = currentState;
+    document.getElementById('fanImage').src = currentState ? 'Fan_ON.png' : 'Fan_OFF.png';
+    document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+  });
+
+  // 🔁 Sync comfort room light state
+  devicesRef.child('comfortRoom/light').on('value', snapshot => {
+    const isOn = snapshot.val();
+    const currentState = isOn !== null ? isOn : false;
+    document.getElementById('comfortLightSwitch').checked = currentState;
+    document.getElementById('comfortLightImage').src = currentState ? 'Light_ON.png' : 'Light_OFF.png';
+    document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+  });
+
+  // 🔁 Sync batch switch if any one of the devices is OFF
+  // Optional: You can dynamically determine if all are ON to reflect in batch switch
+  devicesRef.on('value', snapshot => {
+    const data = snapshot.val() || {};
+    const allOn = data.livingRoom?.bulb && data.bedroom?.fan && data.comfortRoom?.light;
+    document.getElementById('batchSwitch').checked = !!allOn;
+    document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${allOn ? 'limegreen' : 'red'};">${allOn ? 'ON' : 'OFF'}</span>`;
+  });
+</script>
+
 </body>
 </html>
