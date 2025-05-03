@@ -399,7 +399,7 @@
     const isOn = snapshot.val();
     const currentState = isOn !== null ? isOn : false;
     document.getElementById('fanSwitch').checked = currentState;
-    document.getElementById('fanImage').src = currentState ? 'Fan_ON.png' : 'Fan_OFF.png';
+    document.getElementById('fanImage').src = currentState ? 'Fan_ON.gif' : 'Fan_OFF.png';
     document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
   });
 
