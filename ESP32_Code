@@ -1,0 +1,135 @@
+#include <WiFi.h>
+#include <WiFiManager.h>         // WiFiManager by tzapu
+#include <Firebase_ESP_Client.h>
+#include <ArduinoOTA.h>          // OTA Library
+
+
+// Provide the token generation process info
+#include "addons/TokenHelper.h"
+// Provide the RTDB payload printing info and other helper functions
+#include "addons/RTDBHelper.h"
+
+
+// Firebase project credentials
+#define API_KEY "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk"
+#define DATABASE_URL "https://ilaw-piensi-default-rtdb.asia-southeast1.firebasedatabase.app/"
+
+
+// Define GPIO pins for devices
+#define BULB_PIN 23           // GPIO Pin for living room bulb
+#define FAN_PIN 22            // GPIO Pin for bedroom fan
+#define LIGHT_PIN 21          // GPIO Pin for comfort room light
+
+
+// Firebase objects
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig config;
+
+
+// Track previous states
+bool prevBulb = false, prevFan = false, prevComfortLight = false, prevBatch = false;
+
+
+void setup() {
+  Serial.begin(115200);
+
+
+  // -------- WiFiManager: AutoConnect or Portal Setup --------
+  WiFiManager wm;
+  bool res = wm.autoConnect("ESP32_ConfigAP", "configureme"); // SSID and password for config portal
+
+
+  if (!res) {
+    Serial.println("⚠️ Failed to connect to Wi-Fi. Restarting...");
+    delay(3000);
+    ESP.restart();
+  }
+
+
+  Serial.println("✅ Connected to Wi-Fi");
+
+
+  // -------- Configure GPIO Pins as Outputs --------
+  pinMode(BULB_PIN, OUTPUT);
+  pinMode(FAN_PIN, OUTPUT);
+  pinMode(LIGHT_PIN, OUTPUT);
+  pinMode(BATCH_PIN, OUTPUT);
+
+
+  // -------- OTA Setup --------
+  ArduinoOTA.setHostname("ESP32-Firebase");
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start updating firmware via OTA...");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nOTA update complete.");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("OTA Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("OTA Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+  Serial.println("✅ OTA Ready");
+
+
+  // -------- Firebase Setup --------
+  config.api_key = API_KEY;
+  config.database_url = DATABASE_URL;
+
+
+  // Sign in with email/password
+  auth.user.email = "cadangjohnlloyd92@gmail.com";
+  auth.user.password = "Password123";
+
+
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
+}
+
+
+void loop() {
+  ArduinoOTA.handle(); // OTA must be handled frequently
+
+
+  // Check and control each device based on Firebase state
+  readAndPrint("devices/livingRoom/bulb", prevBulb, BULB_PIN);
+  readAndPrint("devices/bedroom/fan", prevFan, FAN_PIN);
+  readAndPrint("devices/comfortRoom/light", prevComfortLight, LIGHT_PIN);
+  readAndPrint("devices/batchControl", prevBatch, BATCH_PIN);
+
+
+  delay(1000); // Read every second
+}
+
+
+void readAndPrint(const String &path, bool &prevState, int pin) {
+  if (Firebase.RTDB.getBool(&fbdo, path)) {
+    bool currentState = fbdo.boolData();
+    if (currentState != prevState) {
+      Serial.printf("[UPDATED] %s: %s\n", path.c_str(), currentState ? "ON" : "OFF");
+      prevState = currentState;
+
+
+      // Control the GPIO based on the state
+      if (currentState) {
+        digitalWrite(pin, HIGH);  // Turn ON the device (set the pin HIGH)
+      } else {
+        digitalWrite(pin, LOW);   // Turn OFF the device (set the pin LOW)
+      }
+    }
+  } else {
+    Serial.printf("[ERROR] Failed to read %s: %s\n", path.c_str(), fbdo.errorReason().c_str());
+  }
+}
+
+
+
+
