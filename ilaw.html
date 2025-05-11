@@ -67,6 +67,11 @@
       align-items: center;
     }
 
+    .room-btn-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
     .room-btn {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -86,6 +91,17 @@
     .room-label {
       margin-top: 10px;
       font-weight: bold;
+    }
+
+    .room-status-dot {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: red;
+      z-index: 2;
     }
 
     .switch {
@@ -126,7 +142,7 @@
     }
 
     input:checked + .slider {
-      background-color: limegreen; /* Changed to limegreen for consistency */
+      background-color: limegreen;
     }
 
     input:checked + .slider:before {
@@ -166,122 +182,142 @@
       object-fit: contain;
     }
 
-    /* Added style for status text color */
     .status span {
-        font-weight: bold; /* Make ON/OFF text bold */
+      font-weight: bold;
+    }
+
+    .back-button {
+      background-color: #ccc;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <header onclick="showPage('main')">
-    <img src="LOGO.png" alt="ILAW Logo" />
-  </header>
+<header onclick="showPage('main')">
+  <img src="LOGO.png" alt="ILAW Logo" />
+</header>
 
-  <!-- MAIN PAGE -->
-  <div id="main" class="page active">
-    <h2>CHOOSE ROOM</h2>
-    <div class="choose-room-image">
-      <img src="Home.png" alt="Choose Room" />
-    </div>
+<!-- MAIN PAGE -->
+<div id="main" class="page active">
+  <h2>CHOOSE ROOM</h2>
+  <div class="choose-room-image">
+    <img src="Home.png" alt="Choose Room" />
+  </div>
 
-    <div class="room-grid">
-      <div class="room-item">
+  <div class="room-grid">
+    <div class="room-item">
+      <div class="room-btn-wrapper">
         <div class="room-btn" onclick="showPage('living-room')">
           <img src="Living_Room.png" alt="Living Room" />
         </div>
-        <div class="room-label">Living Room</div>
+        <div id="dot-living-room" class="room-status-dot"></div>
       </div>
-      <div class="room-item">
+      <div class="room-label">Living Room</div>
+    </div>
+
+    <div class="room-item">
+      <div class="room-btn-wrapper">
         <div class="room-btn" onclick="showPage('bedroom')">
           <img src="Bedroom.png" alt="Bedroom" />
         </div>
-        <div class="room-label">Bedroom</div>
+        <div id="dot-bedroom" class="room-status-dot"></div>
       </div>
-      <div class="room-item">
+      <div class="room-label">Bedroom</div>
+    </div>
+
+    <div class="room-item">
+      <div class="room-btn-wrapper">
         <div class="room-btn" onclick="showPage('comfort-room')">
           <img src="Comfort_Room.png" alt="Comfort Room" />
         </div>
-        <div class="room-label">Comfort Room</div>
+        <div id="dot-comfort-room" class="room-status-dot"></div>
       </div>
+      <div class="room-label">Comfort Room</div>
     </div>
+  </div>
 
-    <h3 style="margin-top: 40px;">BATCH CONTROL</h3>
+  <h3 style="margin-top: 40px;">BATCH CONTROL</h3>
+  <label class="switch">
+    <input type="checkbox" id="batchSwitch" onchange="toggleBatch()">
+    <span class="slider"></span>
+  </label>
+  <div id="batchStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
+</div>
+
+<!-- LIVING ROOM -->
+<div id="living-room" class="page">
+  <button class="back-button" onclick="showPage('main')">← Back</button>
+  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>LIVING ROOM</strong></h2>
+  <div class="responsive-banner">
+    <img src="Living_Room.png" alt="Living Room Banner" />
+  </div>
+  <select onchange="chooseDevice(this.value)">
+    <option value="">Choose Device</option>
+    <option value="light-bulb">Light Bulb</option>
+  </select>
+  <div id="light-bulb-section" style="display: none;">
+    <img id="bulbImage" class="device-img" src="Light_OFF.png" alt="Light Bulb">
     <label class="switch">
-      <input type="checkbox" id="batchSwitch" onchange="toggleBatch()">
+      <input type="checkbox" id="bulbSwitch" onchange="toggleBulb()">
       <span class="slider"></span>
     </label>
-    <div id="batchStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
+    <div id="bulbStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
   </div>
+</div>
 
-  <!-- LIVING ROOM -->
-  <div id="living-room" class="page">
-    <h2>YOU ARE CURRENTLY IN<br>THE: <strong>LIVING ROOM</strong></h2>
-    <div class="responsive-banner">
-      <img src="Living_Room.png" alt="Living Room Banner" />
-    </div>
-
-    <select onchange="chooseDevice(this.value)">
-      <option value="">Choose Device</option>
-      <option value="light-bulb">Light Bulb</option>
-    </select>
-    <div id="light-bulb-section" style="display: none;">
-      <img id="bulbImage" class="device-img" src="Light_OFF.png" alt="Light Bulb">
-      <label class="switch">
-        <input type="checkbox" id="bulbSwitch" onchange="toggleBulb()">
-        <span class="slider"></span>
-      </label>
-      <div id="bulbStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
-    </div>
+<!-- BEDROOM -->
+<div id="bedroom" class="page">
+  <button class="back-button" onclick="showPage('main')">← Back</button>
+  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>BEDROOM</strong></h2>
+  <div class="responsive-banner">
+    <img src="Bedroom.png" alt="Bedroom Banner" />
   </div>
-
-  <!-- BEDROOM -->
-  <div id="bedroom" class="page">
-    <h2>YOU ARE CURRENTLY IN<br>THE: <strong>BEDROOM</strong></h2>
-    <div class="responsive-banner">
-      <img src="Bedroom.png" alt="Bedroom Banner" />
-    </div>
-
-    <select onchange="chooseBedroomDevice(this.value)">
-      <option value="">Choose Device</option>
-      <option value="fan">Fan</option>
-    </select>
-    <div id="fan-section" style="display: none;">
-      <img id="fanImage" class="device-img" src="Fan_OFF.png" alt="Fan" />
-      <label class="switch">
-        <input type="checkbox" id="fanSwitch" onchange="toggleFan()" />
-        <span class="slider"></span>
-      </label>
-      <div id="fanStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
-    </div>
+  <select onchange="chooseBedroomDevice(this.value)">
+    <option value="">Choose Device</option>
+    <option value="fan">Fan</option>
+  </select>
+  <div id="fan-section" style="display: none;">
+    <img id="fanImage" class="device-img" src="Fan_OFF.png" alt="Fan" />
+    <label class="switch">
+      <input type="checkbox" id="fanSwitch" onchange="toggleFan()" />
+      <span class="slider"></span>
+    </label>
+    <div id="fanStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
   </div>
+</div>
 
-  <!-- COMFORT ROOM -->
-  <div id="comfort-room" class="page">
-    <h2>YOU ARE CURRENTLY IN<br>THE: <strong>COMFORT ROOM</strong></h2>
-    <div class="responsive-banner">
-      <img src="Comfort_Room.png" alt="Comfort Room Banner" />
-    </div>
-
-    <select onchange="chooseComfortDevice(this.value)">
-      <option value="">Choose Device</option>
-      <option value="light">Light</option>
-    </select>
-    <div id="comfort-light-section" style="display: none;">
-      <img id="comfortLightImage" class="device-img" src="Light_OFF.png" alt="Comfort Room Light" />
-      <label class="switch">
-        <input type="checkbox" id="comfortLightSwitch" onchange="toggleComfortLight()" />
-        <span class="slider"></span>
-      </label>
-      <div id="comfortLightStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
-    </div>
+<!-- COMFORT ROOM -->
+<div id="comfort-room" class="page">
+  <button class="back-button" onclick="showPage('main')">← Back</button>
+  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>COMFORT ROOM</strong></h2>
+  <div class="responsive-banner">
+    <img src="Comfort_Room.png" alt="Comfort Room Banner" />
   </div>
+  <select onchange="chooseComfortDevice(this.value)">
+    <option value="">Choose Device</option>
+    <option value="light">Light</option>
+  </select>
+  <div id="comfort-light-section" style="display: none;">
+    <img id="comfortLightImage" class="device-img" src="Light_OFF.png" alt="Comfort Room Light" />
+    <label class="switch">
+      <input type="checkbox" id="comfortLightSwitch" onchange="toggleComfortLight()" />
+      <span class="slider"></span>
+    </label>
+    <div id="comfortLightStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
+  </div>
+</div>
 
-  <!-- Firebase SDK -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-  // Your Firebase config here
   const firebaseConfig = {
     apiKey: "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk",
     authDomain: "ilaw-piensi.firebaseapp.com",
@@ -289,138 +325,104 @@
     projectId: "ilaw-piensi",
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-
-  // Reference to the root of the 'devices' node
   const devicesRef = db.ref('devices');
-</script>
 
-<script>
-  // Function to show a specific page
   function showPage(id) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
 
   function toggleBatch() {
-  const status = document.getElementById('batchStatus');
-  const isChecked = document.getElementById('batchSwitch').checked;
-  
-  status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
+    const status = document.getElementById('batchStatus');
+    const isChecked = document.getElementById('batchSwitch').checked;
 
-  const updates = {
-    'livingRoom/bulb': isChecked,
-    'bedroom/fan': isChecked,
-    'comfortRoom/light': isChecked,
-    'batchControl': isChecked // save batch state separately
-  };
+    status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
 
-  devicesRef.update(updates).catch(error => {
-    console.error("Error updating batch state:", error);
-    document.getElementById('batchSwitch').checked = !isChecked;
-    status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
-  });
-}
+    const updates = {
+      'livingRoom/bulb': isChecked,
+      'bedroom/fan': isChecked,
+      'comfortRoom/light': isChecked,
+      'batchControl': isChecked
+    };
 
+    devicesRef.update(updates).catch(error => {
+      console.error("Error updating batch state:", error);
+      document.getElementById('batchSwitch').checked = !isChecked;
+      status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    });
+  }
 
-  // Function to show/hide device section in Living Room based on select value
   function chooseDevice(device) {
     document.getElementById('light-bulb-section').style.display = device === 'light-bulb' ? 'block' : 'none';
   }
 
-  // Function to toggle Living Room Bulb state
   function toggleBulb() {
     const isChecked = document.getElementById('bulbSwitch').checked;
-    // 🔥 Update Firebase
     devicesRef.child('livingRoom/bulb').set(isChecked).catch(error => {
       console.error("Error updating bulb state:", error);
-      // Revert the UI switch state if the update fails
       document.getElementById('bulbSwitch').checked = !isChecked;
       document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
     });
-    // UI update handled by the 'on('value', ...)' listener below
   }
 
-  // Function to show/hide device section in Bedroom based on select value
   function chooseBedroomDevice(device) {
     document.getElementById('fan-section').style.display = device === 'fan' ? 'block' : 'none';
   }
 
-  // Function to toggle Bedroom Fan state
   function toggleFan() {
     const isChecked = document.getElementById('fanSwitch').checked;
-    // 🔥 Update Firebase
     devicesRef.child('bedroom/fan').set(isChecked).catch(error => {
-       console.error("Error updating fan state:", error);
-      // Revert the UI switch state if the update fails
+      console.error("Error updating fan state:", error);
       document.getElementById('fanSwitch').checked = !isChecked;
-       document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+      document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
     });
-     // UI update handled by the 'on('value', ...)' listener below
   }
 
-  // Function to show/hide device section in Comfort Room based on select value
   function chooseComfortDevice(device) {
     document.getElementById('comfort-light-section').style.display = device === 'light' ? 'block' : 'none';
   }
 
-  // Function to toggle Comfort Room Light state
   function toggleComfortLight() {
     const isChecked = document.getElementById('comfortLightSwitch').checked;
-    // 🔥 Update Firebase - Now includes writing to the database!
     devicesRef.child('comfortRoom/light').set(isChecked).catch(error => {
-       console.error("Error updating comfort light state:", error);
-      // Revert the UI switch state if the update fails
+      console.error("Error updating comfort light state:", error);
       document.getElementById('comfortLightSwitch').checked = !isChecked;
-       document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+      document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
     });
-     // UI update handled by the 'on('value', ...)' listener below
   }
 
-  // --- Firebase Listeners for Real-time Sync ---
-  // These listeners ensure the UI reflects the state in the database
-  // even if another client changes the data. They also handle
-  // the initial state when the page loads.
-
-  // 🔁 Sync light bulb state
+  // Real-time Firebase listeners for device and dot status
   devicesRef.child('livingRoom/bulb').on('value', snapshot => {
-    const isOn = snapshot.val();
-    // Ensure snapshot is not null if data doesn't exist yet, default to false (OFF)
-    const currentState = isOn !== null ? isOn : false;
-    document.getElementById('bulbSwitch').checked = currentState;
-    document.getElementById('bulbImage').src = currentState ? 'Light_ON.png' : 'Light_OFF.png';
-    document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+    const isOn = snapshot.val() === true;
+    document.getElementById('bulbSwitch').checked = isOn;
+    document.getElementById('bulbImage').src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
+    document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
+    document.getElementById('dot-living-room').style.backgroundColor = isOn ? 'limegreen' : 'red';
   });
 
-  // 🔁 Sync fan state
   devicesRef.child('bedroom/fan').on('value', snapshot => {
-    const isOn = snapshot.val();
-    const currentState = isOn !== null ? isOn : false;
-    document.getElementById('fanSwitch').checked = currentState;
-    document.getElementById('fanImage').src = currentState ? 'Fan_ON.gif' : 'Fan_OFF.png';
-    document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+    const isOn = snapshot.val() === true;
+    document.getElementById('fanSwitch').checked = isOn;
+    document.getElementById('fanImage').src = isOn ? 'Fan_ON.gif' : 'Fan_OFF.png';
+    document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
+    document.getElementById('dot-bedroom').style.backgroundColor = isOn ? 'limegreen' : 'red';
   });
 
-  // 🔁 Sync comfort room light state
   devicesRef.child('comfortRoom/light').on('value', snapshot => {
-    const isOn = snapshot.val();
-    const currentState = isOn !== null ? isOn : false;
-    document.getElementById('comfortLightSwitch').checked = currentState;
-    document.getElementById('comfortLightImage').src = currentState ? 'Light_ON.png' : 'Light_OFF.png';
-    document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: ${currentState ? 'limegreen' : 'red'};">${currentState ? 'ON' : 'OFF'}</span>`;
+    const isOn = snapshot.val() === true;
+    document.getElementById('comfortLightSwitch').checked = isOn;
+    document.getElementById('comfortLightImage').src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
+    document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
+    document.getElementById('dot-comfort-room').style.backgroundColor = isOn ? 'limegreen' : 'red';
   });
 
-  // 🔁 Sync batch switch if any one of the devices is OFF
-  // Optional: You can dynamically determine if all are ON to reflect in batch switch
-  // 🔁 Sync batch switch independently
   devicesRef.child('batchControl').on('value', snapshot => {
-  const isOn = snapshot.val() === true;
-  document.getElementById('batchSwitch').checked = isOn;
-  document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
-});
-
+    const isOn = snapshot.val() === true;
+    document.getElementById('batchSwitch').checked = isOn;
+    document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
+  });
 </script>
 
 </body>
