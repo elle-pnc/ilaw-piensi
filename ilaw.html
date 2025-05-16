@@ -129,6 +129,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      width: 100%;
     }
 
     .online-user-item {
@@ -140,6 +141,8 @@
       margin-bottom: 8px;
       background: rgba(255, 255, 255, 0.05);
       transition: all 0.3s ease;
+      height: 64px;
+      width: 100%;
     }
 
     .online-user-item:hover {
@@ -153,10 +156,14 @@
       border-radius: 50%;
       border: 2px solid #2ecc71;
       object-fit: cover;
+      flex-shrink: 0;
     }
 
     .online-user-info {
       flex: 1;
+      min-width: 0;
+      max-width: 180px;
+      overflow: hidden;
     }
 
     .online-user-name {
@@ -164,12 +171,21 @@
       font-weight: 500;
       margin: 0;
       font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
     }
 
     .online-user-email {
       color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
-      margin: 0;
+      margin: 2px 0 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      max-width: 100%;
     }
 
     .online-status {
@@ -178,7 +194,8 @@
       border-radius: 50%;
       background: #2ecc71;
       box-shadow: 0 0 10px #2ecc71;
-      margin-left: auto;
+      margin-left: 8px;
+      flex-shrink: 0;
     }
 
     /* User profile styles */
@@ -421,6 +438,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      width: 100%;
     }
 
     .online-user-item {
@@ -432,6 +450,8 @@
       margin-bottom: 8px;
       background: rgba(255, 255, 255, 0.05);
       transition: all 0.3s ease;
+      height: 64px;
+      width: 100%;
     }
 
     .online-user-item:hover {
@@ -445,10 +465,14 @@
       border-radius: 50%;
       border: 2px solid #2ecc71;
       object-fit: cover;
+      flex-shrink: 0;
     }
 
     .online-user-info {
       flex: 1;
+      min-width: 0;
+      max-width: 180px;
+      overflow: hidden;
     }
 
     .online-user-name {
@@ -456,12 +480,19 @@
       font-weight: 500;
       margin: 0;
       font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
     }
 
     .online-user-email {
       color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
-      margin: 0;
+      margin: 2px 0 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .online-status {
@@ -471,6 +502,7 @@
       background: #2ecc71;
       box-shadow: 0 0 10px #2ecc71;
       margin-left: auto;
+      flex-shrink: 0;
     }
 
     /* User profile styles */
