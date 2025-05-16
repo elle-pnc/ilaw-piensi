@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ILAW</title>
+  <title>ILAW - Control Panel</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -11,33 +12,349 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       background-color: #0f3b3e;
       color: white;
       text-align: center;
     }
 
+    /* Header styles */
     header {
-      background-color: #1b1c1e;
+      background-color: rgba(15, 59, 62, 0.75);
       padding: 20px;
-      cursor: pointer;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 99;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    }
+
+    header:hover {
+      background-color: rgba(15, 59, 62, 0.85);
+    }
+
+    header.header-hidden {
+      transform: translateY(-100%);
+      box-shadow: none;
+    }
+
+    header .logo-container {
+      grid-column: 2;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    header .logo-container:hover {
+      transform: scale(1.05);
     }
 
     header img {
       height: 40px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
+    /* Online users panel styles */
+    .online-users-button {
+      grid-column: 1;
+      justify-self: start;
+      margin-left: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #FFD700;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 215, 0, 0.15);
+    }
+
+    .online-users-button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .online-users-button .count {
+      background: rgba(46, 204, 113, 0.2);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #2ecc71;
+    }
+
+    .online-users-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      background: rgba(15, 59, 62, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 215, 0, 0.15);
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      padding: 80px 20px 20px;
+    }
+
+    .online-users-panel.show {
+      transform: translateX(0);
+    }
+
+    .online-users-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .online-user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .online-user-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+
+    .online-user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #2ecc71;
+      object-fit: cover;
+    }
+
+    .online-user-info {
+      flex: 1;
+    }
+
+    .online-user-name {
+      color: #FFD700;
+      font-weight: 500;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .online-user-email {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .online-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 10px #2ecc71;
+      margin-left: auto;
+    }
+
+    /* User profile styles */
+    .user-profile {
+      grid-column: 3;
+      justify-self: end;
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 10px 15px;
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      z-index: 100;
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .user-profile:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 215, 0, 0.25);
+    }
+
+    .user-profile img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-left: 10px;
+      border: 2px solid #FFD700;
+      transition: transform 0.3s ease;
+    }
+
+    .user-profile img:not(.has-image) {
+      cursor: pointer;
+    }
+
+    .user-profile img:not(.has-image):hover {
+      transform: scale(1.1);
+    }
+
+    /* Profile image tooltip */
+    .tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      white-space: nowrap;
+      z-index: 1000;
+      display: none;
+    }
+
+    .user-profile img:not(.has-image):hover + .tooltip {
+      opacity: 1;
+      display: block;
+    }
+
+    /* Hide file input */
+    .profile-image-input {
+      display: none;
+    }
+
+    /* Add loading animation */
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .user-profile img.loading {
+      animation: pulse 1s infinite;
+    }
+
+    .user-profile .user-info {
+      margin-right: 10px;
+      text-align: right;
+    }
+
+    .user-profile .user-name {
+      font-weight: bold;
+      color: #FFD700;
+      font-size: 15px;
+      transition: color 0.3s ease;
+    }
+
+    .user-profile:hover .user-name {
+      color: #FFF;
+    }
+
+    .user-profile .user-email {
+      font-size: 0.8em;
+      color: #EFECE7;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .user-profile:hover .user-email {
+      opacity: 1;
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background-color: rgba(15, 59, 62, 0.85);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 12px;
+      padding: 8px;
+      display: none;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      transform-origin: top right;
+      animation: dropdownShow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dropdown-menu button {
+      background: none;
+      border: none;
+      color: #FFD700;
+      padding: 10px 16px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dropdown-menu button:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 150%;
+      height: 150%;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent 70%);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dropdown-menu button:hover {
+      background-color: rgba(255, 215, 0, 0.08);
+      transform: translateX(4px);
+      color: #FFF;
+    }
+
+    .dropdown-menu button:hover:after {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .dropdown-menu button:active {
+      transform: translateX(4px) scale(0.98);
+    }
+
+    /* Page styles */
     .page {
       display: none;
       padding: 20px;
+      padding-top: 120px; /* Increased spacing from header */
+      animation: fadeIn 0.3s ease;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .active {
       display: block;
-    }
-
-    h2 {
-      margin-top: 20px;
     }
 
     .choose-room-image {
@@ -45,39 +362,52 @@
       max-width: 150px;
       aspect-ratio: 1 / 1;
       margin: 0 auto 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     .choose-room-image img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
     }
 
     .room-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 20px;
-      max-width: 600px;
-      margin: auto;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
 
     .room-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: rgba(16, 39, 40, 0.6);
+      border-radius: 20px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 215, 0, 0.1);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
     }
 
-    .room-btn-wrapper {
-      position: relative;
-      width: 100%;
+    .room-item:hover {
+      transform: translateY(-10px);
+      background: rgba(16, 39, 40, 0.8);
+      border-color: rgba(255, 215, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .room-btn {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      background-color: #102728;
-      border-radius: 10px;
-      cursor: pointer;
+      aspect-ratio: 16/9;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
       overflow: hidden;
     }
 
@@ -85,30 +415,144 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 10%;
+      padding: 20px;
+      transition: transform 0.5s ease;
+    }
+
+    .room-item:hover .room-btn img {
+      transform: scale(1.1);
     }
 
     .room-label {
-      margin-top: 10px;
-      font-weight: bold;
+      font-size: 18px;
+      font-weight: 600;
+      color: #FFD700;
+      margin: 15px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .room-status-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .room-status-dot {
-      position: absolute;
-      top: 8px;
-      right: 10px;
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background-color: red;
-      z-index: 2;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    /* Device controls */
+    .status {
+      font-size: 14px;
+      padding: 8px 15px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px auto;
+      width: fit-content;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #FFD700;
+    }
+
+    .status-value {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Toggle switch styles */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(231, 76, 60, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 3px;
+      background-color: #fff;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .toggle-slider {
+      background-color: rgba(46, 204, 113, 0.3);
+      border-color: rgba(46, 204, 113, 0.2);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+      background-color: #2ecc71;
+    }
+
+    input:focus + .toggle-slider {
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    }
+
+    /* Device controls */
+    .status {
+      font-size: 14px;
+      padding: 8px 15px;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 10px auto;
+      width: fit-content;
     }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 60px;
-      height: 34px;
+      width: 50px;
+      height: 24px;
+      margin-right: 5px;
     }
 
     .switch input {
@@ -126,14 +570,14 @@
       bottom: 0;
       background-color: #333;
       transition: .4s;
-      border-radius: 34px;
+      border-radius: 24px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 26px;
-      width: 26px;
+      height: 16px;
+      width: 16px;
       left: 4px;
       bottom: 4px;
       background-color: white;
@@ -142,21 +586,18 @@
     }
 
     input:checked + .slider {
-      background-color: limegreen;
+      background-color: #2ecc71;
     }
 
     input:checked + .slider:before {
       transform: translateX(26px);
     }
 
-    select {
-      margin: 20px auto;
-      padding: 10px;
-      font-size: 16px;
-      max-width: 80%;
-      width: 250px;
-      display: block;
-      border-radius: 12px;
+    .device-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
     }
 
     .device-img {
@@ -166,264 +607,1265 @@
       object-fit: contain;
       margin: 20px auto;
       display: block;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .responsive-banner {
-      width: 30vw;
-      max-width: 150px;
-      aspect-ratio: 1 / 1;
-      margin: 0 auto 20px;
+    .device-img.on {
+      transform: scale(1.05);
+      filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
     }
 
-    .responsive-banner img,
-    .living-room-banner {
+    .device-img.off {
+      transform: scale(1);
+      filter: brightness(0.9);
+    }
+
+    /* Select dropdown */
+    .device-select-container {
+      position: relative;
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      max-width: 300px;
+      margin: 30px auto;
     }
 
-    .status span {
-      font-weight: bold;
-    }
-
-    .back-button {
-      background-color: #ccc;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: bold;
+    .custom-select {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      color: #FFD700;
+      padding: 15px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      width: 100%;
       cursor: pointer;
-      margin-bottom: 20px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(5px);
+      position: relative;
+      text-align: left;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      background-size: 16px;
+      z-index: 1;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
+
+    .custom-select:hover, .custom-select:focus {
+      background-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .custom-select[aria-expanded="true"] {
+      border-color: rgba(255, 215, 0, 0.4);
+    }
+
+    .select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(27, 28, 30, 0.95);
+      border: 1px solid rgba(255, 215, 0, 0.2);
+      border-radius: 15px;
+      margin-top: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.98);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .select-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .select-option {
+      padding: 12px 20px;
+      color: #FFD700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .select-option:after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: rgba(255, 215, 0, 0.1);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .select-option:hover {
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .select-option:hover:after {
+      transform: scaleX(1);
+    }
+
+    .select-option[aria-selected="true"] {
+      background: rgba(255, 215, 0, 0.15);
+      font-weight: bold;
+    }
+
+    .select-option[aria-selected="true"]:before {
+      content: '✓';
+      margin-right: 10px;
+      color: #2ecc71;
+    }
+
+    /* Enhanced background animation */
+    .background-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at bottom left, 
+        rgba(255, 215, 0, 0), 
+        rgba(255, 215, 0, 0));
+      opacity: 0;
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .background-overlay::before,
+    .background-overlay::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+
+    .background-overlay::before {
+      background: radial-gradient(circle at top right,
+        rgba(46, 204, 113, 0.15),
+        transparent 70%);
+    }
+
+    .background-overlay::after {
+      background: radial-gradient(circle at bottom left,
+        rgba(255, 215, 0, 0.15),
+        transparent 70%);
+    }
+
+    .background-overlay.active {
+      opacity: 1;
+      animation: pulseBackground 4s ease-in-out infinite;
+    }
+
+    .background-overlay.active::before {
+      opacity: 0.8;
+      animation: floatGradient 8s ease-in-out infinite;
+    }
+
+    .background-overlay.active::after {
+      opacity: 0.8;
+      animation: floatGradient 8s ease-in-out infinite reverse;
+    }
+
+    .background-overlay.inactive {
+      opacity: 0;
+      animation: none;
+    }
+
+    .background-overlay.inactive::before,
+    .background-overlay.inactive::after {
+      opacity: 0;
+      animation: none;
+    }
+
+    @keyframes pulseBackground {
+      0%, 100% {
+        background: radial-gradient(circle at center,
+          rgba(255, 215, 0, 0.1),
+          rgba(255, 215, 0, 0.02) 50%,
+          transparent 70%);
+      }
+      50% {
+        background: radial-gradient(circle at center,
+          rgba(255, 215, 0, 0.15),
+          rgba(255, 215, 0, 0.05) 50%,
+          transparent 70%);
+      }
+    }
+
+    @keyframes floatGradient {
+      0%, 100% {
+        transform: translate(0, 0);
+      }
+      25% {
+        transform: translate(2%, 2%);
+      }
+      50% {
+        transform: translate(0, 4%);
+      }
+      75% {
+        transform: translate(-2%, 2%);
+      }
+    }
+
+    /* Enhance body background for better effect */
+    body:before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at top right, rgba(46, 204, 113, 0.1), transparent 70%),
+                  radial-gradient(circle at bottom left, rgba(255, 215, 0, 0.1), transparent 70%);
+      backdrop-filter: blur(20px);
+      z-index: -1;
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.batch-active:before {
+      background: radial-gradient(circle at top right, rgba(46, 204, 113, 0.2), transparent 80%),
+                  radial-gradient(circle at bottom left, rgba(255, 215, 0, 0.2), transparent 80%);
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% {
+        background-position: 0% 0%;
+      }
+      50% {
+        background-position: 100% 100%;
+      }
+    }
+
+    /* Device status indicators */
+    .device-status {
+      position: relative;
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-left: 10px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .device-status.on {
+      background-color: #2ecc71;
+      box-shadow: 0 0 15px #2ecc71;
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    .device-status.off {
+      background-color: #e74c3c;
+      box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px #2ecc71;
+      }
+      50% {
+        box-shadow: 0 0 25px #2ecc71;
+      }
+    }
+
+    /* Fan animation */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    #fanImage.on {
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1.05);
+        filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
+      }
+      50% {
+        transform: scale(1.02);
+        filter: brightness(1.1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+      }
+    }
+
+    /* Back button styles */
+    .back-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #FFD700;
+      padding: 12px 24px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: 20px 0 40px;
+      backdrop-filter: blur(5px);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .back-button:before {
+      content: '←';
+      font-size: 20px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: 5px;
+    }
+
+    .back-button:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 150%;
+      height: 150%;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.2), transparent 70%);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .back-button:hover {
+      background: rgba(255, 215, 0, 0.1);
+      transform: translateX(-5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      color: #FFF;
+    }
+
+    .back-button:hover:before {
+      transform: translateX(-5px);
+    }
+
+    .back-button:hover:after {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .back-button:active {
+      transform: translateX(-5px) scale(0.98);
+    }
+
+    .back-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+    }
+
+    @keyframes dropdownShow {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-menu button:last-child {
+      margin-bottom: 0;
+    }
+
+    .dropdown-menu button i {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
   </style>
 </head>
 <body>
-<header onclick="showPage('main')">
-  <img src="LOGO.png" alt="ILAW Logo" />
-</header>
+  <!-- Background overlay for lighting effect -->
+  <div class="background-overlay" id="backgroundOverlay"></div>
 
-<!-- MAIN PAGE -->
-<div id="main" class="page active">
-  <h2>CHOOSE ROOM</h2>
-  <div class="choose-room-image">
-    <img src="Home.png" alt="Choose Room" />
-  </div>
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <img src="LOGO.png" alt="ILAW Logo">
+    </div>
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <div class="user-info">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-email" id="userEmail"></div>
+      </div>
+      <input type="file" id="profileImageInput" class="profile-image-input" accept="image/*" onchange="handleProfileImageUpload(event)">
+      <img id="userImage" src="default-avatar.png" alt="User Profile">
+      <div class="tooltip" id="profileTooltip">Click to set profile picture (can only be set once)</div>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <button onclick="window.location.href='dashboard.html'">
+          <i class="fas fa-home"></i>
+          Dashboard
+        </button>
+        <button onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <div class="room-grid">
-    <div class="room-item">
-      <div class="room-btn-wrapper">
+  <!-- MAIN PAGE -->
+  <div id="main" class="page active">
+    <h2>CHOOSE ROOM</h2>
+    <div class="choose-room-image">
+      <img src="Home.png" alt="Choose Room" />
+    </div>
+
+    <div class="room-grid">
+      <div class="room-item">
         <div class="room-btn" onclick="showPage('living-room')">
           <img src="Living_Room.png" alt="Living Room" />
         </div>
-        <div id="dot-living-room" class="room-status-dot"></div>
+        <div class="room-label">
+          Living Room
+          <div class="room-status-container">
+            <span id="dot-living-room" class="room-status-dot"></span>
+          </div>
+        </div>
       </div>
-      <div class="room-label">Living Room</div>
-    </div>
 
-    <div class="room-item">
-      <div class="room-btn-wrapper">
+      <div class="room-item">
         <div class="room-btn" onclick="showPage('bedroom')">
           <img src="Bedroom.png" alt="Bedroom" />
         </div>
-        <div id="dot-bedroom" class="room-status-dot"></div>
+        <div class="room-label">
+          Bedroom
+          <div class="room-status-container">
+            <span id="dot-bedroom" class="room-status-dot"></span>
+          </div>
+        </div>
       </div>
-      <div class="room-label">Bedroom</div>
-    </div>
 
-    <div class="room-item">
-      <div class="room-btn-wrapper">
+      <div class="room-item">
         <div class="room-btn" onclick="showPage('comfort-room')">
           <img src="Comfort_Room.png" alt="Comfort Room" />
         </div>
-        <div id="dot-comfort-room" class="room-status-dot"></div>
+        <div class="room-label">
+          Comfort Room
+          <div class="room-status-container">
+            <span id="dot-comfort-room" class="room-status-dot"></span>
+          </div>
+        </div>
       </div>
-      <div class="room-label">Comfort Room</div>
+    </div>
+
+    <div class="batch-control">
+      <h3>BATCH CONTROL</h3>
+      <label class="switch">
+        <input type="checkbox" id="batchSwitch" onchange="toggleBatch()">
+        <span class="slider"></span>
+      </label>
+      <div id="batchStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
     </div>
   </div>
 
-  <h3 style="margin-top: 40px;">BATCH CONTROL</h3>
-  <label class="switch">
-    <input type="checkbox" id="batchSwitch" onchange="toggleBatch()">
-    <span class="slider"></span>
-  </label>
-  <div id="batchStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
-</div>
+  <!-- LIVING ROOM -->
+  <div id="living-room" class="page">
+    <button class="back-button" onclick="showPage('main')">Back to Rooms</button>
+    <h2>LIVING ROOM</h2>
+    
+    <div class="device-select-container">
+      <div class="custom-select" id="livingRoomSelect">Choose Device</div>
+      <div class="select-dropdown" id="livingRoomDropdown">
+        <div class="select-option" data-value="">Choose Device</div>
+        <div class="select-option" data-value="light-bulb">Light Bulb</div>
+      </div>
+    </div>
 
-<!-- LIVING ROOM -->
-<div id="living-room" class="page">
-  <button class="back-button" onclick="showPage('main')">← Back</button>
-  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>LIVING ROOM</strong></h2>
-  <div class="responsive-banner">
-    <img src="Living_Room.png" alt="Living Room Banner" />
+    <div id="light-bulb-section" class="device-container" style="display: none;">
+      <img id="bulbImage" class="device-img" src="Light_OFF.png" alt="Light Bulb">
+      <div id="bulbStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="bulbSwitch" onchange="toggleBulb()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <select onchange="chooseDevice(this.value)">
-    <option value="">Choose Device</option>
-    <option value="light-bulb">Light Bulb</option>
-  </select>
-  <div id="light-bulb-section" style="display: none;">
-    <img id="bulbImage" class="device-img" src="Light_OFF.png" alt="Light Bulb">
-    <label class="switch">
-      <input type="checkbox" id="bulbSwitch" onchange="toggleBulb()">
-      <span class="slider"></span>
-    </label>
-    <div id="bulbStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
+
+  <!-- BEDROOM -->
+  <div id="bedroom" class="page">
+    <button class="back-button" onclick="showPage('main')">Back to Rooms</button>
+    <h2>BEDROOM</h2>
+    
+    <div class="device-select-container">
+      <div class="custom-select" id="bedroomSelect">Choose Device</div>
+      <div class="select-dropdown" id="bedroomDropdown">
+        <div class="select-option" data-value="">Choose Device</div>
+        <div class="select-option" data-value="fan">Fan</div>
+      </div>
+    </div>
+
+    <div id="fan-section" class="device-container" style="display: none;">
+      <img id="fanImage" class="device-img" src="Fan_OFF.png" alt="Fan" />
+      <div id="fanStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="fanSwitch" onchange="toggleFan()" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- BEDROOM -->
-<div id="bedroom" class="page">
-  <button class="back-button" onclick="showPage('main')">← Back</button>
-  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>BEDROOM</strong></h2>
-  <div class="responsive-banner">
-    <img src="Bedroom.png" alt="Bedroom Banner" />
+  <!-- COMFORT ROOM -->
+  <div id="comfort-room" class="page">
+    <button class="back-button" onclick="showPage('main')">Back to Rooms</button>
+    <h2>COMFORT ROOM</h2>
+    
+    <div class="device-select-container">
+      <div class="custom-select" id="comfortSelect">Choose Device</div>
+      <div class="select-dropdown" id="comfortDropdown">
+        <div class="select-option" data-value="">Choose Device</div>
+        <div class="select-option" data-value="light">Light</div>
+      </div>
+    </div>
+
+    <div id="comfort-light-section" class="device-container" style="display: none;">
+      <img id="comfortLightImage" class="device-img" src="Light_OFF.png" alt="Comfort Room Light" />
+      <div id="comfortLightStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="comfortLightSwitch" onchange="toggleComfortLight()" />
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <select onchange="chooseBedroomDevice(this.value)">
-    <option value="">Choose Device</option>
-    <option value="fan">Fan</option>
-  </select>
-  <div id="fan-section" style="display: none;">
-    <img id="fanImage" class="device-img" src="Fan_OFF.png" alt="Fan" />
-    <label class="switch">
-      <input type="checkbox" id="fanSwitch" onchange="toggleFan()" />
-      <span class="slider"></span>
-    </label>
-    <div id="fanStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
+
+  <!-- Online users panel -->
+  <div id="onlineUsersPanel" class="online-users-panel">
+    <h2>Online Users</h2>
+    <ul class="online-users-list">
+      <!-- Online users will be dynamically added here -->
+    </ul>
   </div>
-</div>
 
-<!-- COMFORT ROOM -->
-<div id="comfort-room" class="page">
-  <button class="back-button" onclick="showPage('main')">← Back</button>
-  <h2>YOU ARE CURRENTLY IN<br>THE: <strong>COMFORT ROOM</strong></h2>
-  <div class="responsive-banner">
-    <img src="Comfort_Room.png" alt="Comfort Room Banner" />
-  </div>
-  <select onchange="chooseComfortDevice(this.value)">
-    <option value="">Choose Device</option>
-    <option value="light">Light</option>
-  </select>
-  <div id="comfort-light-section" style="display: none;">
-    <img id="comfortLightImage" class="device-img" src="Light_OFF.png" alt="Comfort Room Light" />
-    <label class="switch">
-      <input type="checkbox" id="comfortLightSwitch" onchange="toggleComfortLight()" />
-      <span class="slider"></span>
-    </label>
-    <div id="comfortLightStatus" class="status">Current Status: <span style="color: red;">OFF</span></div>
-  </div>
-</div>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk",
-    authDomain: "ilaw-piensi.firebaseapp.com",
-    databaseURL: "https://ilaw-piensi-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    projectId: "ilaw-piensi",
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const devicesRef = db.ref('devices');
-
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  function toggleBatch() {
-    const status = document.getElementById('batchStatus');
-    const isChecked = document.getElementById('batchSwitch').checked;
-
-    status.innerHTML = `Current Status: <span style="color: ${isChecked ? 'limegreen' : 'red'};">${isChecked ? 'ON' : 'OFF'}</span>`;
-
-    const updates = {
-      'livingRoom/bulb': isChecked,
-      'bedroom/fan': isChecked,
-      'comfortRoom/light': isChecked,
-      'batchControl': isChecked
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwHNCoJQpAvmCU5Z4vy1nUJPjnm3IlCXk",
+      authDomain: "ilaw-piensi.firebaseapp.com",
+      databaseURL: "https://ilaw-piensi-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "ilaw-piensi",
+      storageBucket: "ilaw-piensi.appspot.com"
     };
 
-    devicesRef.update(updates).catch(error => {
-      console.error("Error updating batch state:", error);
-      document.getElementById('batchSwitch').checked = !isChecked;
-      status.innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    const devicesRef = db.ref('devices');
+    const connectedRef = db.ref('.info/connected');
+    const onlineUsersRef = db.ref('presence');
+
+    // Initialize room states
+    const roomStates = {
+      livingRoom: false,
+      bedroom: false,
+      comfortRoom: false
+    };
+
+    // Update room status indicators
+    function updateRoomStatus(roomId, isOn) {
+      const dot = document.getElementById(`dot-${roomId}`);
+      if (dot) {
+        dot.style.backgroundColor = isOn ? '#2ecc71' : '#e74c3c';
+        dot.style.boxShadow = `0 0 10px ${isOn ? '#2ecc71' : '#e74c3c'}`;
+        
+        // Add glow effect for active state
+        if (isOn) {
+          dot.style.animation = 'pulseGlow 2s ease-in-out infinite';
+        } else {
+          dot.style.animation = 'none';
+        }
+      }
+    }
+
+    // Function to check all room states and update batch control
+    function updateBatchControlFromRooms() {
+      const allOn = Object.values(roomStates).every(state => state === true);
+      const allOff = Object.values(roomStates).every(state => state === false);
+      
+      const batchSwitch = document.getElementById('batchSwitch');
+      const batchStatus = document.getElementById('batchStatus');
+      
+      if (batchSwitch && batchStatus) {
+        if (allOn || allOff) {
+          // Only update Firebase if the state is different
+          if (batchSwitch.checked !== allOn) {
+            devicesRef.child('batchControl').set(allOn);
+          }
+        }
+      }
+    }
+
+    // Online users management
+    let myConnectionsRef;
+    let lastOnlineRef;
+
+    // Add online users button to header
+    const headerElement = document.querySelector('header');
+    const onlineUsersButton = document.createElement('button');
+    onlineUsersButton.className = 'online-users-button';
+    onlineUsersButton.innerHTML = '<i class="fas fa-users"></i> Online Users <span class="count">0</span>';
+    headerElement.insertBefore(onlineUsersButton, headerElement.firstChild);
+
+    // Handle online users panel visibility
+    const onlineUsersPanel = document.getElementById('onlineUsersPanel');
+    onlineUsersButton.addEventListener('click', () => {
+      onlineUsersPanel.classList.toggle('show');
     });
-  }
 
-  function chooseDevice(device) {
-    document.getElementById('light-bulb-section').style.display = device === 'light-bulb' ? 'block' : 'none';
-  }
-
-  function toggleBulb() {
-    const isChecked = document.getElementById('bulbSwitch').checked;
-    devicesRef.child('livingRoom/bulb').set(isChecked).catch(error => {
-      console.error("Error updating bulb state:", error);
-      document.getElementById('bulbSwitch').checked = !isChecked;
-      document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!onlineUsersPanel.contains(e.target) && !onlineUsersButton.contains(e.target)) {
+        onlineUsersPanel.classList.remove('show');
+      }
     });
-  }
 
-  function chooseBedroomDevice(device) {
-    document.getElementById('fan-section').style.display = device === 'fan' ? 'block' : 'none';
-  }
+    // Initialize presence system
+    function initializePresence(userId) {
+      // Create references that will manage presence
+      myConnectionsRef = db.ref(`presence/${userId}/connections`);
+      lastOnlineRef = db.ref(`presence/${userId}/lastOnline`);
 
-  function toggleFan() {
-    const isChecked = document.getElementById('fanSwitch').checked;
-    devicesRef.child('bedroom/fan').set(isChecked).catch(error => {
-      console.error("Error updating fan state:", error);
-      document.getElementById('fanSwitch').checked = !isChecked;
-      document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+      // When the client's connection state changes
+      connectedRef.on('value', (snap) => {
+        if (snap.val() === true) {
+          // Client is connected
+          const con = myConnectionsRef.push(true);
+
+          // When this client disconnects, remove this connection
+          con.onDisconnect().remove();
+
+          // When this client disconnects, update the last online timestamp
+          lastOnlineRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+        }
+      });
+    }
+
+    // Update online users list
+    function updateOnlineUsersList(users) {
+      const usersList = document.querySelector('.online-users-list');
+      usersList.innerHTML = '';
+      let onlineCount = 0;
+
+      Object.entries(users).forEach(([userId, userData]) => {
+        if (userData.connections) {
+          onlineCount++;
+          const userItem = document.createElement('li');
+          userItem.className = 'online-user-item';
+          
+          // Get user details from the users node
+          db.ref(`users/${userId}`).once('value').then((snapshot) => {
+            const userDetails = snapshot.val() || {};
+            
+            userItem.innerHTML = `
+              <img class="online-user-avatar" src="${userDetails.profileImage || 'default-avatar.png'}" alt="User Avatar">
+              <div class="online-user-info">
+                <p class="online-user-name">${userDetails.displayName || 'User'}</p>
+                <p class="online-user-email">${userDetails.email || ''}</p>
+              </div>
+              <div class="online-status"></div>
+            `;
+          });
+          
+          usersList.appendChild(userItem);
+        }
+      });
+
+      // Update the count in the button
+      const countSpan = document.querySelector('.online-users-button .count');
+      countSpan.textContent = onlineCount;
+    }
+
+    // Listen for presence changes
+    onlineUsersRef.on('value', (snapshot) => {
+      const users = snapshot.val() || {};
+      updateOnlineUsersList(users);
     });
-  }
 
-  function chooseComfortDevice(device) {
-    document.getElementById('comfort-light-section').style.display = device === 'light' ? 'block' : 'none';
-  }
+    // Real-time Firebase listeners for device and room status
+    function initializeRoomListeners() {
+      // Living Room Listener
+      devicesRef.child('livingRoom').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        const isOn = data.bulb === true;
+        roomStates.livingRoom = isOn;
+        
+        // Update device state
+        const bulbSwitch = document.getElementById('bulbSwitch');
+        const bulbImage = document.getElementById('bulbImage');
+        const bulbStatus = document.getElementById('bulbStatus');
+        
+        if (bulbSwitch) bulbSwitch.checked = isOn;
+        if (bulbImage) {
+          bulbImage.src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
+          bulbImage.className = `device-img ${isOn ? 'on' : 'off'}`;
+        }
+        if (bulbStatus) {
+          bulbStatus.className = `status ${isOn ? 'on' : 'off'}`;
+          updateStatus(bulbStatus, isOn);
+        }
+        
+        // Update room indicator
+        updateRoomStatus('living-room', isOn);
+        // Check if batch control needs to be updated
+        updateBatchControlFromRooms();
+      });
 
-  function toggleComfortLight() {
-    const isChecked = document.getElementById('comfortLightSwitch').checked;
-    devicesRef.child('comfortRoom/light').set(isChecked).catch(error => {
-      console.error("Error updating comfort light state:", error);
-      document.getElementById('comfortLightSwitch').checked = !isChecked;
-      document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: red;">Update Failed</span>`;
+      // Bedroom Listener
+      devicesRef.child('bedroom').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        const isOn = data.fan === true;
+        roomStates.bedroom = isOn;
+        
+        // Update device state
+        const fanSwitch = document.getElementById('fanSwitch');
+        const fanImage = document.getElementById('fanImage');
+        const fanStatus = document.getElementById('fanStatus');
+        
+        if (fanSwitch) fanSwitch.checked = isOn;
+        if (fanImage) {
+          fanImage.src = isOn ? 'Fan_ON.gif' : 'Fan_OFF.png';
+          fanImage.className = `device-img ${isOn ? 'on' : 'off'}`;
+        }
+        if (fanStatus) {
+          fanStatus.className = `status ${isOn ? 'on' : 'off'}`;
+          updateStatus(fanStatus, isOn);
+        }
+        
+        // Update room indicator
+        updateRoomStatus('bedroom', isOn);
+        // Check if batch control needs to be updated
+        updateBatchControlFromRooms();
+      });
+
+      // Comfort Room Listener
+      devicesRef.child('comfortRoom').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        const isOn = data.light === true;
+        roomStates.comfortRoom = isOn;
+        
+        // Update device state
+        const lightSwitch = document.getElementById('comfortLightSwitch');
+        const lightImage = document.getElementById('comfortLightImage');
+        const lightStatus = document.getElementById('comfortLightStatus');
+        
+        if (lightSwitch) lightSwitch.checked = isOn;
+        if (lightImage) {
+          lightImage.src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
+          lightImage.className = `device-img ${isOn ? 'on' : 'off'}`;
+        }
+        if (lightStatus) {
+          lightStatus.className = `status ${isOn ? 'on' : 'off'}`;
+          updateStatus(lightStatus, isOn);
+        }
+        
+        // Update room indicator
+        updateRoomStatus('comfort-room', isOn);
+        // Check if batch control needs to be updated
+        updateBatchControlFromRooms();
+      });
+
+      // Batch Control Listener
+      devicesRef.child('batchControl').on('value', snapshot => {
+        const isOn = snapshot.val() === true;
+        const batchSwitch = document.getElementById('batchSwitch');
+        const batchStatus = document.getElementById('batchStatus');
+        
+        if (batchSwitch) batchSwitch.checked = isOn;
+        if (batchStatus) {
+          batchStatus.className = `status ${isOn ? 'on' : 'off'}`;
+          updateStatus(batchStatus, isOn);
+        }
+        
+        // Update background effect
+        updateBackgroundState(isOn);
+      });
+    }
+
+    // Initialize listeners when auth state changes
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.replace('index.html');
+        return;
+      }
+
+      // Initialize presence system for this user
+      initializePresence(user.uid);
+
+      const userProfile = document.getElementById('userProfile');
+      const userName = document.getElementById('userName');
+      const userEmail = document.getElementById('userEmail');
+      const userImage = document.getElementById('userImage');
+
+      // Store user details in the users node
+      db.ref(`users/${user.uid}`).update({
+        displayName: user.displayName || 'User',
+        email: user.email,
+        lastLogin: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      userName.textContent = user.displayName || 'User';
+      userEmail.textContent = user.email;
+
+      // Get profile image from database
+      db.ref('users/' + user.uid + '/profileImage').once('value')
+        .then((snapshot) => {
+          const profileImage = snapshot.val();
+          if (profileImage) {
+            userImage.src = profileImage;
+            userImage.classList.add('has-image');
+            updateTooltip(true);
+          } else {
+            updateTooltip(false);
+          }
+        });
+
+      userProfile.style.display = 'flex';
+      
+      // Initialize room listeners after authentication
+      initializeRoomListeners();
     });
-  }
 
-  // Real-time Firebase listeners for device and dot status
-  devicesRef.child('livingRoom/bulb').on('value', snapshot => {
-    const isOn = snapshot.val() === true;
-    document.getElementById('bulbSwitch').checked = isOn;
-    document.getElementById('bulbImage').src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
-    document.getElementById('bulbStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
-    document.getElementById('dot-living-room').style.backgroundColor = isOn ? 'limegreen' : 'red';
-  });
+    // Update device toggle functions to handle errors properly
+    function toggleBulb() {
+      const isChecked = document.getElementById('bulbSwitch').checked;
+      devicesRef.child('livingRoom/bulb').set(isChecked)
+        .catch(error => {
+          console.error("Error updating bulb state:", error);
+          document.getElementById('bulbSwitch').checked = !isChecked;
+          const status = document.getElementById('bulbStatus');
+          status.innerHTML = `Current Status: <span style="color: #e74c3c;">Error: ${error.message}</span>`;
+          setTimeout(() => updateStatus(status, !isChecked), 3000);
+        });
+    }
 
-  devicesRef.child('bedroom/fan').on('value', snapshot => {
-    const isOn = snapshot.val() === true;
-    document.getElementById('fanSwitch').checked = isOn;
-    document.getElementById('fanImage').src = isOn ? 'Fan_ON.gif' : 'Fan_OFF.png';
-    document.getElementById('fanStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
-    document.getElementById('dot-bedroom').style.backgroundColor = isOn ? 'limegreen' : 'red';
-  });
+    function toggleFan() {
+      const isChecked = document.getElementById('fanSwitch').checked;
+      devicesRef.child('bedroom/fan').set(isChecked)
+        .catch(error => {
+          console.error("Error updating fan state:", error);
+          document.getElementById('fanSwitch').checked = !isChecked;
+          const status = document.getElementById('fanStatus');
+          status.innerHTML = `Current Status: <span style="color: #e74c3c;">Error: ${error.message}</span>`;
+          setTimeout(() => updateStatus(status, !isChecked), 3000);
+        });
+    }
 
-  devicesRef.child('comfortRoom/light').on('value', snapshot => {
-    const isOn = snapshot.val() === true;
-    document.getElementById('comfortLightSwitch').checked = isOn;
-    document.getElementById('comfortLightImage').src = isOn ? 'Light_ON.png' : 'Light_OFF.png';
-    document.getElementById('comfortLightStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
-    document.getElementById('dot-comfort-room').style.backgroundColor = isOn ? 'limegreen' : 'red';
-  });
+    function toggleComfortLight() {
+      const isChecked = document.getElementById('comfortLightSwitch').checked;
+      devicesRef.child('comfortRoom/light').set(isChecked)
+        .catch(error => {
+          console.error("Error updating comfort light state:", error);
+          document.getElementById('comfortLightSwitch').checked = !isChecked;
+          const status = document.getElementById('comfortLightStatus');
+          status.innerHTML = `Current Status: <span style="color: #e74c3c;">Error: ${error.message}</span>`;
+          setTimeout(() => updateStatus(status, !isChecked), 3000);
+        });
+    }
 
-  devicesRef.child('batchControl').on('value', snapshot => {
-    const isOn = snapshot.val() === true;
-    document.getElementById('batchSwitch').checked = isOn;
-    document.getElementById('batchStatus').innerHTML = `Current Status: <span style="color: ${isOn ? 'limegreen' : 'red'};">${isOn ? 'ON' : 'OFF'}</span>`;
-  });
-</script>
+    // Remove old listeners
+    devicesRef.child('livingRoom/bulb').off();
+    devicesRef.child('bedroom/fan').off();
+    devicesRef.child('comfortRoom/light').off();
+    devicesRef.child('batchControl').off();
+
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // Background animation
+    function updateBackgroundState(isActive) {
+      const overlay = document.getElementById('backgroundOverlay');
+      const body = document.body;
+
+      if (isActive) {
+        // Add active classes with slight delay for smooth transition
+        overlay.classList.remove('inactive');
+        setTimeout(() => {
+          overlay.classList.add('active');
+          body.classList.add('batch-active');
+        }, 50);
+
+        // Add pulsing effect to all active devices
+        const deviceImages = document.querySelectorAll('.device-img.on');
+        deviceImages.forEach(img => {
+          img.style.animation = img.id === 'fanImage' ? 'spin 2s linear infinite' : 'pulse 2s infinite';
+        });
+
+      } else {
+        // Remove active classes
+        overlay.classList.remove('active');
+        overlay.classList.add('inactive');
+        body.classList.remove('batch-active');
+
+        // Remove pulsing effect from devices
+        const deviceImages = document.querySelectorAll('.device-img');
+        deviceImages.forEach(img => {
+          if (!img.id.includes('fan') || !img.classList.contains('on')) {
+            img.style.animation = 'none';
+          }
+        });
+      }
+    }
+
+    function toggleBatch() {
+      const status = document.getElementById('batchStatus');
+      const isChecked = document.getElementById('batchSwitch').checked;
+      const batchControl = document.querySelector('.batch-control');
+
+      updateBackgroundState(isChecked);
+      updateStatus(status, isChecked);
+
+      const updates = {
+        'livingRoom/bulb': isChecked,
+        'bedroom/fan': isChecked,
+        'comfortRoom/light': isChecked,
+        'batchControl': isChecked
+      };
+
+      devicesRef.update(updates).catch(error => {
+        console.error("Error updating batch state:", error);
+        document.getElementById('batchSwitch').checked = !isChecked;
+        updateStatus(status, !isChecked);
+        batchControl.classList.toggle('active');
+      });
+    }
+
+    // Add animation to select elements
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+      select.addEventListener('mousedown', () => {
+        select.style.animation = 'none';
+        setTimeout(() => {
+          select.style.animation = 'selectOpen 0.3s ease forwards';
+        }, 0);
+      });
+    });
+
+    // Add click handler for profile
+    const userProfile = document.getElementById('userProfile');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    userProfile.onclick = function(event) {
+      dropdownMenu.classList.toggle('show');
+      event.stopPropagation();
+    };
+
+    // Handle logout
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.replace('index.html');
+      }).catch((error) => {
+        console.error('Error signing out:', error);
+      });
+    }
+
+    // Close dropdown when clicking outside
+    window.onclick = function(event) {
+      if (!event.target.closest('.user-profile')) {
+        dropdownMenu.classList.remove('show');
+      }
+    }
+
+    // Custom select dropdown functionality
+    const selectContainers = document.querySelectorAll('.device-select-container');
+    selectContainers.forEach(container => {
+      const customSelect = container.querySelector('.custom-select');
+      const dropdown = container.querySelector('.select-dropdown');
+      const options = container.querySelectorAll('.select-option');
+
+      customSelect.addEventListener('click', (e) => {
+        e.preventDefault();
+        dropdown.classList.toggle('show');
+      });
+
+      options.forEach(option => {
+        option.addEventListener('click', () => {
+          const value = option.dataset.value;
+          customSelect.textContent = option.textContent;
+          dropdown.classList.remove('show');
+          
+          // Call the appropriate function based on the container
+          if (container.querySelector('#livingRoomSelect')) {
+            chooseDevice(value);
+          } else if (container.querySelector('#bedroomSelect')) {
+            chooseBedroomDevice(value);
+          } else if (container.querySelector('#comfortSelect')) {
+            chooseComfortDevice(value);
+          }
+        });
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!container.contains(e.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+    });
+
+    function chooseDevice(device) {
+      const section = document.getElementById('light-bulb-section');
+      if (device === 'light-bulb') {
+        section.style.display = 'flex';
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.opacity = '1';
+          section.style.transform = 'translateY(0)';
+        }, 0);
+      } else {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    function chooseBedroomDevice(device) {
+      const section = document.getElementById('fan-section');
+      if (device === 'fan') {
+        section.style.display = 'flex';
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.opacity = '1';
+          section.style.transform = 'translateY(0)';
+        }, 0);
+      } else {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    function chooseComfortDevice(device) {
+      const section = document.getElementById('comfort-light-section');
+      if (device === 'light') {
+        section.style.display = 'flex';
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.opacity = '1';
+          section.style.transform = 'translateY(0)';
+        }, 0);
+      } else {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          section.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // Update status colors with new structure
+    function updateStatus(element, isOn) {
+      const statusValue = element.querySelector('.status-value');
+      if (statusValue) {
+        statusValue.textContent = isOn ? 'ON' : 'OFF';
+        statusValue.style.color = isOn ? '#2ecc71' : '#e74c3c';
+        statusValue.style.textShadow = isOn ? '0 0 10px rgba(46, 204, 113, 0.5)' : 'none';
+      }
+    }
+
+    // Update device sections HTML
+    document.getElementById('light-bulb-section').innerHTML = `
+      <img id="bulbImage" class="device-img" src="Light_OFF.png" alt="Light Bulb">
+      <div id="bulbStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="bulbSwitch" onchange="toggleBulb()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('fan-section').innerHTML = `
+      <img id="fanImage" class="device-img" src="Fan_OFF.png" alt="Fan">
+      <div id="fanStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="fanSwitch" onchange="toggleFan()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('comfort-light-section').innerHTML = `
+      <img id="comfortLightImage" class="device-img" src="Light_OFF.png" alt="Comfort Room Light">
+      <div id="comfortLightStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="comfortLightSwitch" onchange="toggleComfortLight()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    `;
+
+    // Update batch control section
+    document.querySelector('.batch-control').innerHTML = `
+      <h3>BATCH CONTROL</h3>
+      <div id="batchStatus" class="status">
+        <label class="toggle-switch">
+          <input type="checkbox" id="batchSwitch" onchange="toggleBatch()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div class="status-label">
+          Current Status: <span class="status-value" style="color: #e74c3c;">OFF</span>
+        </div>
+      </div>
+    `;
+
+    // Add header scroll behavior
+    let lastScrollTop = 0;
+    const header = document.querySelector('header');
+    const scrollThreshold = 50;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (Math.abs(lastScrollTop - currentScroll) <= scrollThreshold) return;
+      
+      if (currentScroll > lastScrollTop && currentScroll > 100) {
+        // Scrolling down & past header
+        header.classList.add('header-hidden');
+      } else {
+        // Scrolling up or at top
+        header.classList.remove('header-hidden');
+      }
+      
+      lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    }, { passive: true });
+
+    // Add profile image upload functionality
+    function handleProfileImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const user = auth.currentUser;
+      if (!user) return;
+
+      // Check if user already has a profile image
+      db.ref('users/' + user.uid + '/profileImage').once('value')
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            alert('Profile picture can only be set once.');
+            event.target.value = '';
+            return;
+          }
+
+          // Show loading state
+          const userImage = document.getElementById('userImage');
+          userImage.style.opacity = '0.5';
+
+          // Read file as Base64
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const imageData = e.target.result;
+            
+            // Store in Firebase Realtime Database
+            db.ref('users/' + user.uid + '/profileImage').set(imageData)
+              .then(() => {
+                // Update the image in the UI
+                userImage.src = imageData;
+                userImage.style.opacity = '1';
+                userImage.classList.add('has-image');
+                updateTooltip(true);
+              })
+              .catch((error) => {
+                console.error("Error saving profile image:", error);
+                userImage.style.opacity = '1';
+              });
+          };
+          reader.readAsDataURL(file);
+        });
+    }
+
+    // Function to update tooltip text
+    function updateTooltip(hasImage) {
+      const tooltip = document.getElementById('profileTooltip');
+      if (!hasImage) {
+        tooltip.textContent = 'Click to set profile picture';
+      }
+    }
+
+    // Add click handler for profile image
+    const userImage = document.getElementById('userImage');
+    userImage.addEventListener('click', (event) => {
+      event.stopPropagation();
+      // If user has an image, toggle dropdown
+      if (userImage.classList.contains('has-image')) {
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        dropdownMenu.classList.toggle('show');
+        return;
+      }
+      document.getElementById('profileImageInput').click();
+    });
+
+    // Add file size validation
+    document.getElementById('profileImageInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        if (file.size > 500000) { // 500KB limit
+          alert('Please choose an image smaller than 500KB');
+          event.target.value = '';
+          return;
+        }
+        handleProfileImageUpload(event);
+      }
+    });
+
+    // Room status functions are now handled by Firebase listeners
+  </script>
 
 </body>
 </html>
