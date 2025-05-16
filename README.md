@@ -22,10 +22,6 @@ GitHub
 
 Getting Started
 Clone the Repository:
-
-bash
-Copy
-Edit
 git clone https://github.com/elle-pnc/ilaw-piensi.git
 cd ilaw-piensi
 Open the Interface:
