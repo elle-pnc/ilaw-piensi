@@ -1198,7 +1198,7 @@
           <i class="fas fa-home"></i>
           Control Panel
         </button>
-        <button onclick="logout()">
+        <button onclick="handleLogout()">
           <i class="fas fa-sign-out-alt"></i>
           Logout
         </button>
@@ -1233,6 +1233,20 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getDatabase(app);
+
+  // Make auth available globally
+  window.auth = auth;
+
+  // Handle logout
+  window.handleLogout = async function() {
+    try {
+      await auth.signOut();
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error('Error signing out:', error);
+      alert('Failed to log out. Please try again.');
+    }
+  };
 
   // Hide content initially
   document.querySelector('.carousel').style.display = 'none';
@@ -1398,16 +1412,6 @@
       window.location.replace('index.html');
     }
   }, 5000); // 5 second timeout
-
-  // Handle logout
-  window.logout = async function() {
-    try {
-      await signOut(auth);
-      window.location.replace('index.html');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 </script>
 
   <div class="carousel">
