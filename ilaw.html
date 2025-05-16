@@ -21,14 +21,15 @@
     /* Header styles */
     header {
       background-color: rgba(15, 59, 62, 0.75);
-      padding: 20px;
+      padding: 15px;
       position: fixed;
       width: 100%;
       top: 0;
       left: 0;
       z-index: 99;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: auto 1fr auto;
+      grid-gap: 15px;
       align-items: center;
       backdrop-filter: blur(8px);
       box-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
@@ -49,6 +50,9 @@
       grid-column: 2;
       text-align: center;
       transition: transform 0.3s ease;
+      min-width: 0;
+      display: flex;
+      justify-content: center;
     }
 
     header .logo-container:hover {
@@ -56,8 +60,310 @@
     }
 
     header img {
-      height: 40px;
+      height: 35px;
+      width: auto;
       filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      object-fit: contain;
+    }
+
+    /* Online users panel styles */
+    .online-users-button {
+      grid-column: 1;
+      justify-self: start;
+      margin-left: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #FFD700;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      white-space: nowrap;
+      min-width: 0;
+    }
+
+    .online-users-button .fa-users {
+      font-size: 14px;
+    }
+
+    .online-users-button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .online-users-button .count {
+      background: rgba(46, 204, 113, 0.2);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #2ecc71;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .online-users-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      background: rgba(15, 59, 62, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 215, 0, 0.15);
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      padding: 80px 20px 20px;
+    }
+
+    .online-users-panel.show {
+      transform: translateX(0);
+    }
+
+    .online-users-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .online-user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .online-user-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+
+    .online-user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #2ecc71;
+      object-fit: cover;
+    }
+
+    .online-user-info {
+      flex: 1;
+    }
+
+    .online-user-name {
+      color: #FFD700;
+      font-weight: 500;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .online-user-email {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .online-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #2ecc71;
+      box-shadow: 0 0 10px #2ecc71;
+      margin-left: auto;
+    }
+
+    /* User profile styles */
+    .user-profile {
+      grid-column: 3;
+      justify-self: end;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.08);
+      padding: 8px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      z-index: 100;
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 0;
+    }
+
+    .user-profile:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 215, 0, 0.25);
+    }
+
+    .user-profile img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-left: 8px;
+      border: 2px solid #FFD700;
+      transition: transform 0.3s ease;
+      object-fit: cover;
+    }
+
+    .user-profile .user-info {
+      margin-right: 8px;
+      text-align: right;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .user-profile .user-name {
+      font-weight: bold;
+      color: #FFD700;
+      font-size: 13px;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .user-profile .user-email {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header {
+        padding: 10px;
+        grid-gap: 10px;
+      }
+
+      header img {
+        height: 30px;
+      }
+
+      .online-users-button {
+        margin-left: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .online-users-button .count {
+        padding: 2px 5px;
+        font-size: 10px;
+        min-width: 20px;
+      }
+
+      .user-profile {
+        margin-right: 10px;
+        padding: 6px 10px;
+      }
+
+      .user-profile img {
+        width: 30px;
+        height: 30px;
+        margin-left: 6px;
+      }
+
+      .user-profile .user-name {
+        font-size: 12px;
+        max-width: 120px;
+      }
+
+      .user-profile .user-email {
+        font-size: 10px;
+        max-width: 120px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      header {
+        grid-template-columns: auto auto auto;
+        padding: 8px;
+        grid-gap: 8px;
+      }
+
+      .online-users-button {
+        margin-left: 8px;
+        padding: 6px 10px;
+      }
+
+      .online-users-button span:not(.count) {
+        display: none;
+      }
+
+      .user-profile .user-info {
+        display: none;
+      }
+
+      .user-profile {
+        padding: 6px;
+        margin-right: 8px;
+      }
+
+      .user-profile img {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 360px) {
+      header img {
+        height: 25px;
+      }
+
+      .online-users-button {
+        padding: 5px 8px;
+      }
+
+      .online-users-button .fa-users {
+        font-size: 12px;
+      }
+
+      .online-users-button .count {
+        padding: 1px 4px;
+        font-size: 9px;
+        min-width: 16px;
+      }
+
+      .user-profile img {
+        width: 25px;
+        height: 25px;
+      }
+    }
+
+    /* High contrast and reduced motion support */
+    @media (prefers-contrast: high) {
+      header {
+        background-color: var(--primary-color);
+        border-bottom: 2px solid var(--secondary-color);
+      }
+
+      .online-users-button,
+      .user-profile {
+        border: 2px solid var(--secondary-color);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      header,
+      .online-users-button,
+      .user-profile,
+      header .logo-container {
+        transition: none;
+      }
     }
 
     /* Online users panel styles */
