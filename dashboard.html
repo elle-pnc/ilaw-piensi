@@ -312,7 +312,7 @@
       left: 0;
       z-index: 99;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr minmax(auto, max-content) 1fr;
       grid-gap: 15px;
       align-items: center;
       backdrop-filter: blur(8px);
@@ -331,12 +331,13 @@
     }
 
     header .logo-container {
-      grid-column: 1;
+      grid-column: 2;
       text-align: center;
       transition: transform 0.3s ease;
       min-width: 0;
       display: flex;
       justify-content: center;
+      margin: 0 auto;
     }
 
     header .logo-container:hover {
@@ -448,7 +449,7 @@
 
     @media (max-width: 576px) {
       header {
-        grid-template-columns: auto auto auto;
+        grid-template-columns: 1fr minmax(auto, max-content) 1fr;
         padding: 8px;
         grid-gap: 8px;
       }
@@ -596,8 +597,8 @@
     }
 
     @keyframes spin {
-      0% { transform: translateX(-50%) rotate(0deg); }
-      100% { transform: translateX(-50%) rotate(360deg); }
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
     .try-button {
@@ -1417,7 +1418,7 @@
         <img src="PAGE1.png" alt="Phone + House Logo" style="width: 180px; margin-bottom: 1rem;">
         <h1><strong>ILAW</strong>, or <strong>Internet-Linked Appliances and Wireless Control</strong></h1>
         <p>Revolutionizing home appliance life using IoT. Control lights and appliances remotely using a smartphone or browser.</p>
-        <p>Powered by ESP32, with a web-based control interface. Technology and convenience combined.</p>
+        <p>Powered by ESP32/ESP8266, with a web-based control interface. Technology and convenience combined.</p>
       </div>
 
       <!-- Slide 2 -->
