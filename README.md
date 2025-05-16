@@ -20,27 +20,6 @@ Dynamic icons indicating device states (e.g., Fan_ON.gif, Light_OFF.png).
 User-friendly interface with images and animations.
 GitHub
 
-**Project Structure**
-bash
-Copy
-Edit
-ilaw-piensi/
-├── ESP32_Code/           # Placeholder for ESP32 microcontroller code
-├── dashboard.html        # Main dashboard interface
-├── ilaw.html             # Additional interface page
-├── index.html            # Landing page
-├── assets/               # Images and icons for the UI
-│   ├── Bedroom.png
-│   ├── Comfort_Room.png
-│   ├── Fan_OFF.png
-│   ├── Fan_ON.gif
-│   ├── Home.png
-│   ├── Light_OFF.png
-│   ├── Light_ON.png
-│   ├── Living_Room.png
-│   ├── LOGO.png
-│   └── ...               # Other image assets
-└── README.md             # Project documentation
 Getting Started
 Clone the Repository:
 
